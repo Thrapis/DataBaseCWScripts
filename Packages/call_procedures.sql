@@ -53,7 +53,7 @@ CREATE OR REPLACE PACKAGE BODY Call_Package IS
 
     PROCEDURE GetAllCalls(call_cur out sys_refcursor) IS
     BEGIN
-        open call_cur for select * from CALL;
+        OPEN call_cur FOR SELECT * FROM CALL;
     END;
 
 END Call_Package;

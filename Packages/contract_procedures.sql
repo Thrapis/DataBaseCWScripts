@@ -6,7 +6,8 @@ CREATE OR REPLACE PACKAGE Contract_Package IS
 	FUNCTION GetContractById(par_id in int) RETURN CONTRACT%rowtype;
 	PROCEDURE GetAllContracts(contract_cur out sys_refcursor);
 	PROCEDURE GetContractBalance(par_id in int, balance out float);
-	FUNCTION GetServiceRecommendationsByContract(par_contract_id in int, par_recommendations_count in int) RETURN sys_refcursor;
+	PROCEDURE GetAllServicesByContractId(par_id in int, service_cur out sys_refcursor);
+	PROCEDURE GetServiceRecommendationsByContract(par_id in int, par_recommendations_count in int, service_descriptions_cur out sys_refcursor);
 END Contract_Package;
 
 
@@ -67,35 +68,39 @@ CREATE OR REPLACE PACKAGE BODY Contract_Package IS
         balance := payments - debits;
     END;
 
-    FUNCTION GetServiceRecommendationsByContract(par_contract_id in int, par_recommendations_count in int) RETURN sys_refcursor IS
-        recommended_services sys_refcursor;
+    PROCEDURE GetAllServicesByContractId(par_id in int, service_cur out sys_refcursor) IS
+    BEGIN
+        OPEN service_cur FOR SELECT S.* FROM SERVICE S
+            INNER JOIN CONTRACT C on S.CONTRACT_ID = C.ID
+            WHERE C.ID = par_id;
+    END;
+
+    PROCEDURE GetServiceRecommendationsByContract(par_id in int, par_recommendations_count in int, service_descriptions_cur out sys_refcursor) IS
         selected_item_set int := -1;
     BEGIN
-        SELECT COALESCE(ITEMSET_ID, -1) INTO selected_item_set FROM DM$P4SERVICE_ASSOC_MODEL a
+        SELECT DISTINCT COALESCE(ITEMSET_ID, -1) INTO selected_item_set FROM DM$P4SERVICE_ASSOC_MODEL a
         WHERE NOT EXISTS(SELECT S.DESCRIPTION_ID FROM SERVICE S INNER JOIN
-                            CONTRACT C on S.CONTRACT_ID = C.ID WHERE C.ID = par_contract_id
+                            CONTRACT C on S.CONTRACT_ID = C.ID WHERE C.ID = par_id
                          MINUS
                         SELECT ITEM_ID FROM DM$P4SERVICE_ASSOC_MODEL a1
                             WHERE a.ITEMSET_ID = a1.ITEMSET_ID)
         GROUP BY ITEMSET_ID
         HAVING COUNT(ITEMSET_ID) =
                     (SELECT COUNT(S.DESCRIPTION_ID) FROM SERVICE S INNER JOIN
-                            CONTRACT C on S.CONTRACT_ID = C.ID WHERE C.ID = par_contract_id);
+                            CONTRACT C on S.CONTRACT_ID = C.ID WHERE C.ID = par_id);
 
-        OPEN recommended_services FOR SELECT * FROM SERVICE_DESCRIPTION WHERE ID IN
+        OPEN service_descriptions_cur FOR SELECT * FROM SERVICE_DESCRIPTION WHERE ID IN
             (SELECT ITEM_ID FROM DM$P4SERVICE_ASSOC_MODEL WHERE ITEMSET_ID IN
             (SELECT CONSEQUENT_ITEMSET_ID FROM (SELECT * FROM DM$P0SERVICE_ASSOC_MODEL
             WHERE ANTECEDENT_ITEMSET_ID = selected_item_set ORDER BY LIFT DESC) WHERE ROWNUM <= par_recommendations_count));
 
-        return recommended_services;
     EXCEPTION
         WHEN OTHERS THEN
             selected_item_set := -1;
-            OPEN recommended_services FOR SELECT * FROM SERVICE_DESCRIPTION WHERE ID IN
+            OPEN service_descriptions_cur FOR SELECT * FROM SERVICE_DESCRIPTION WHERE ID IN
                 (SELECT ITEM_ID FROM DM$P4SERVICE_ASSOC_MODEL WHERE ITEMSET_ID IN
                 (SELECT CONSEQUENT_ITEMSET_ID FROM (SELECT * FROM DM$P0SERVICE_ASSOC_MODEL
                 WHERE ANTECEDENT_ITEMSET_ID = selected_item_set ORDER BY LIFT DESC) WHERE ROWNUM <= par_recommendations_count));
-            return recommended_services;
     END;
 
 END Contract_Package;
