@@ -18,3 +18,4 @@ BEGIN
     new_par_event_datetime := TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS');
     Account_Package.InsertAccountEvent(login_par, new_par_event_datetime, new_par_message, event_inserted);
 END;
+

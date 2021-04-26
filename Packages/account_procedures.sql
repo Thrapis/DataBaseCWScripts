@@ -63,11 +63,9 @@ CREATE OR REPLACE PACKAGE BODY Account_Package IS                -----Start of p
     BEGIN
         INSERT INTO ACCOUNT_EVENT (ACCOUNT_LOGIN, EVENT_DATETIME, MESSAGE) VALUES (par_username, TO_TIMESTAMP(par_event_datetime, 'YYYY-MM-DD HH24:MI:SS'), par_message);
         inserted := sql%rowcount;
-        COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
             inserted := 0;
-            ROLLBACK;
     END;
 
 END Account_Package;

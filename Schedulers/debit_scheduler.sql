@@ -54,7 +54,7 @@ select * from user_scheduler_jobs;
 select * from user_scheduler_job_log;
 
 begin
-    dbms_scheduler.disable('job_debits_detection');
+    dbms_scheduler.enable('job_debits_detection');
 end;
 
 begin

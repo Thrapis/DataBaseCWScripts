@@ -2,7 +2,7 @@ DECLARE
     xml_clob clob;
 BEGIN
     select dbms_xmlgen.getxml('select * from ACCOUNT') into xml_clob from dual;
-    DBMS_XSLPROCESSOR.CLOB2FILE(cl => xml_clob, flocation => 'XMLDATA', fname => 'ACCOUNTS.xml');
+    DBMS_XSLPROCESSOR.CLOB2FILE(cl => xml_clob, flocation => 'XMLDATA', fname => 'ACCOUNT.xml');
 END;
 
 DECLARE

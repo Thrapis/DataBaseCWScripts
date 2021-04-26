@@ -163,7 +163,7 @@ INSERT INTO PAYMENT SELECT x.*
                             COLUMNS ID          int           PATH 'ID',
                                     CONTRACT_ID   int PATH 'CONTRACT_ID',
                                     PAYMENT_AMOUNT   float(126) PATH 'PAYMENT_AMOUNT',
-                                    PAYMENT_DATETIME  timestamp PATH 'PAYMENT_DATETIME') x;
+                                    PAYMENT_DATETIME  nvarchar2(50) PATH 'PAYMENT_DATETIME') x;
 
 DECLARE
     last_val int := 0;
