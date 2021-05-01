@@ -3,7 +3,7 @@ CREATE OR REPLACE PACKAGE Debit_Package IS
 	PROCEDURE InsertDebit(par_contract_id in int, par_debit_amount in float, par_debit_datetime in nvarchar2, par_reason in nvarchar2, inserted out int);
 	PROCEDURE UpdateDebit(par_id in int, par_contract_id in int, par_debit_amount in float, par_debit_datetime in nvarchar2, par_reason in nvarchar2, updated out int);
     PROCEDURE DeleteDebit(par_id in int, deleted out int);
-	FUNCTION GetDebitById(par_id in int) RETURN DEBIT%rowtype;
+	PROCEDURE GetDebitById(par_id in int, debit_cur out sys_refcursor);
 	PROCEDURE GetAllDebits(debit_cur out sys_refcursor);
 	PROCEDURE DetectAndInsertTermDebits;
 END Debit_Package;
@@ -14,42 +14,39 @@ CREATE OR REPLACE PACKAGE BODY Debit_Package IS
 
     PROCEDURE InsertDebit(par_contract_id in int, par_debit_amount in float, par_debit_datetime in nvarchar2, par_reason in nvarchar2, inserted out int) IS
     BEGIN
-        INSERT INTO DEBIT (CONTRACT_ID, DEBIT_AMOUNT, DEBIT_DATETIME, REASON) VALUES (par_contract_id, ROUND(par_debit_amount, 2), TO_TIMESTAMP(par_debit_datetime, 'YYYY-MM-DD HH24:MI:SS'), par_reason);
-        inserted := sql%rowcount;
+        INSERT INTO DEBIT (CONTRACT_ID, DEBIT_AMOUNT, DEBIT_DATETIME, REASON) VALUES (par_contract_id, ROUND(par_debit_amount, 2), TO_TIMESTAMP(par_debit_datetime, 'YYYY-MM-DD HH24:MI:SS'), par_reason)
+        RETURNING ID INTO inserted;
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            inserted := 0;
+            inserted := -1;
             ROLLBACK;
     END;
 
     PROCEDURE UpdateDebit(par_id in int, par_contract_id in int, par_debit_amount in float, par_debit_datetime in nvarchar2, par_reason in nvarchar2, updated out int) IS
     BEGIN
-        UPDATE DEBIT set CONTRACT_ID = par_contract_id, DEBIT_AMOUNT = ROUND(par_debit_amount, 2), DEBIT_DATETIME = TO_TIMESTAMP(par_debit_datetime, 'YYYY-MM-DD HH24:MI:SS'), REASON = par_reason WHERE ID = par_id;
-        updated := sql%rowcount;
+        UPDATE DEBIT set CONTRACT_ID = par_contract_id, DEBIT_AMOUNT = ROUND(par_debit_amount, 2), DEBIT_DATETIME = TO_TIMESTAMP(par_debit_datetime, 'YYYY-MM-DD HH24:MI:SS'), REASON = par_reason WHERE ID = par_id
+        RETURNING ID INTO updated;
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            updated := 0;
+            updated := -1;
             ROLLBACK;
     END;
 
     PROCEDURE DeleteDebit(par_id in int, deleted out int) IS
     BEGIN
-        DELETE DEBIT WHERE ID = par_id;
-        deleted := sql%rowcount;
+        DELETE DEBIT WHERE ID = par_id RETURNING ID INTO deleted;
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            deleted := 0;
+            deleted := -1;
             ROLLBACK;
     END;
 
-    FUNCTION GetDebitById(par_id in int) RETURN DEBIT%rowtype IS
-        debit_row DEBIT%rowtype;
+    PROCEDURE GetDebitById(par_id in int, debit_cur out sys_refcursor) IS
     BEGIN
-        SELECT * INTO debit_row FROM DEBIT WHERE ID = par_id;
-        return debit_row;
+        OPEN debit_cur FOR SELECT * FROM DEBIT WHERE ID = par_id;
     END;
 
     PROCEDURE GetAllDebits(debit_cur out sys_refcursor) IS

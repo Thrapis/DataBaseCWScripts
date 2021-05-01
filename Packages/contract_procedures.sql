@@ -3,7 +3,7 @@ CREATE OR REPLACE PACKAGE Contract_Package IS
 	PROCEDURE InsertContract(par_tariff_id in int, par_client_id in int, par_employee_id in int, par_signing_datetime in nvarchar2, inserted out int);
 	PROCEDURE UpdateContract(par_id in int, par_tariff_id in int, par_client_id in int, par_employee_id in int, par_signing_datetime in nvarchar2, updated out int);
     PROCEDURE DeleteContract(par_id in int, deleted out int);
-	FUNCTION GetContractById(par_id in int) RETURN CONTRACT%rowtype;
+	PROCEDURE GetContractById(par_id in int, contract_cur out sys_refcursor);
 	PROCEDURE GetAllContracts(contract_cur out sys_refcursor);
 	PROCEDURE GetContractBalance(par_id in int, balance out float);
 	PROCEDURE GetAllServicesByContractId(par_id in int, service_cur out sys_refcursor);
@@ -16,47 +16,44 @@ CREATE OR REPLACE PACKAGE BODY Contract_Package IS
 
     PROCEDURE InsertContract(par_tariff_id in int, par_client_id in int, par_employee_id in int, par_signing_datetime in nvarchar2, inserted out int) IS
     BEGIN
-        INSERT INTO CONTRACT (TARIFF_ID, CLIENT_ID, EMPLOYEE_ID, SIGNING_DATETIME) VALUES (par_tariff_id, par_client_id, par_employee_id, TO_TIMESTAMP(par_signing_datetime, 'YYYY-MM-DD HH24:MI:SS'));
-        inserted := sql%rowcount;
+        INSERT INTO CONTRACT (TARIFF_ID, CLIENT_ID, EMPLOYEE_ID, SIGNING_DATETIME) VALUES (par_tariff_id, par_client_id, par_employee_id, TO_TIMESTAMP(par_signing_datetime, 'YYYY-MM-DD HH24:MI:SS'))
+        RETURNING ID INTO inserted;
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            inserted := 0;
+            inserted := -1;
             ROLLBACK;
     END;
 
     PROCEDURE UpdateContract(par_id in int, par_tariff_id in int, par_client_id in int, par_employee_id in int, par_signing_datetime in nvarchar2, updated out int) IS
     BEGIN
-        UPDATE CONTRACT set TARIFF_ID = par_tariff_id, CLIENT_ID = par_client_id, EMPLOYEE_ID = par_employee_id, SIGNING_DATETIME = TO_TIMESTAMP(par_signing_datetime, 'YYYY-MM-DD HH24:MI:SS') WHERE ID = par_id;
-        updated := sql%rowcount;
+        UPDATE CONTRACT set TARIFF_ID = par_tariff_id, CLIENT_ID = par_client_id, EMPLOYEE_ID = par_employee_id, SIGNING_DATETIME = TO_TIMESTAMP(par_signing_datetime, 'YYYY-MM-DD HH24:MI:SS') WHERE ID = par_id
+        RETURNING ID INTO updated;
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            updated := 0;
+            updated := -1;
             ROLLBACK;
     END;
 
     PROCEDURE DeleteContract(par_id in int, deleted out int) IS
     BEGIN
-        DELETE CONTRACT WHERE ID = par_id;
-        deleted := sql%rowcount;
+        DELETE CONTRACT WHERE ID = par_id RETURNING ID INTO deleted;
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            deleted := 0;
+            deleted := -1;
             ROLLBACK;
     END;
 
-    FUNCTION GetContractById(par_id in int) RETURN CONTRACT%rowtype IS
-        contract_row CONTRACT%rowtype;
+    PROCEDURE GetContractById(par_id in int, contract_cur out sys_refcursor) IS
     BEGIN
-        SELECT * INTO contract_row FROM CONTRACT WHERE ID = par_id;
-        return contract_row;
+        OPEN contract_cur FOR SELECT * FROM CONTRACT WHERE ID = par_id;
     END;
 
     PROCEDURE GetAllContracts(contract_cur out sys_refcursor) IS
     BEGIN
-        open contract_cur for select * from CONTRACT;
+        OPEN contract_cur FOR SELECT * FROM CONTRACT;
     END;
 
     PROCEDURE GetContractBalance(par_id in int, balance out float) IS
@@ -104,4 +101,3 @@ CREATE OR REPLACE PACKAGE BODY Contract_Package IS
     END;
 
 END Contract_Package;
-

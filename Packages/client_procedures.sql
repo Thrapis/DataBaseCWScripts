@@ -3,7 +3,8 @@ CREATE OR REPLACE PACKAGE Client_Package IS
 	PROCEDURE InsertClient(par_full_name in nvarchar2, par_passport_number in nvarchar2, par_account_login in nvarchar2, inserted out int);
 	PROCEDURE UpdateClient(par_id in int, par_full_name in nvarchar2, par_passport_number in nvarchar2, par_account_login in nvarchar2, updated out int);
     PROCEDURE DeleteClient(par_id in int, deleted out int);
-	FUNCTION GetClientById(par_id in int) RETURN CLIENT%rowtype;
+	PROCEDURE GetClientById(par_id in int, client_cur out sys_refcursor);
+	PROCEDURE GetClientByLogin(par_login in nvarchar2, client_cur out sys_refcursor);
 	PROCEDURE GetAllClients(client_cur out sys_refcursor);
 	PROCEDURE GetAllServicesByClientId(par_id in int, service_cur out sys_refcursor);
 	PROCEDURE GetAllContractsByClientId(par_id in int, contract_cur out sys_refcursor);
@@ -19,45 +20,47 @@ CREATE OR REPLACE PACKAGE BODY Client_Package IS
     BEGIN
         SELECT COUNT(*) INTO LikeInsertion FROM CLIENT WHERE PASSPORT_NUMBER = par_passport_number;
         IF LikeInsertion = 0 THEN
-            INSERT INTO CLIENT (FULL_NAME, PASSPORT_NUMBER, ACCOUNT_LOGIN) VALUES (par_full_name, par_passport_number, par_account_login);
-            inserted := sql%rowcount;
+            INSERT INTO CLIENT (FULL_NAME, PASSPORT_NUMBER, ACCOUNT_LOGIN) VALUES (par_full_name, par_passport_number, par_account_login)
+            RETURNING ID INTO inserted;
         ELSE
-            inserted := 0;
+            inserted := -1;
         END IF;
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            inserted := 0;
+            inserted := -1;
             ROLLBACK;
     END;
 
     PROCEDURE UpdateClient(par_id in int, par_full_name in nvarchar2, par_passport_number in nvarchar2, par_account_login in nvarchar2, updated out int) IS
     BEGIN
-        UPDATE CLIENT set FULL_NAME = par_full_name, PASSPORT_NUMBER = par_passport_number, ACCOUNT_LOGIN = par_account_login WHERE ID = par_id;
-        updated := sql%rowcount;
+        UPDATE CLIENT set FULL_NAME = par_full_name, PASSPORT_NUMBER = par_passport_number, ACCOUNT_LOGIN = par_account_login WHERE ID = par_id
+        RETURNING ID INTO updated;
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            updated := 0;
+            updated := -1;
             ROLLBACK;
     END;
 
     PROCEDURE DeleteClient(par_id in int, deleted out int) IS
     BEGIN
-        DELETE CLIENT WHERE ID = par_id;
-        deleted := sql%rowcount;
+        DELETE CLIENT WHERE ID = par_id RETURNING ID INTO deleted;
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            deleted := 0;
+            deleted := -1;
             ROLLBACK;
     END;
 
-    FUNCTION GetClientById(par_id in int) RETURN CLIENT%rowtype IS
-        client_row CLIENT%rowtype;
+    PROCEDURE GetClientById(par_id in int, client_cur out sys_refcursor) IS
     BEGIN
-        SELECT * INTO client_row FROM CLIENT WHERE ID = par_id;
-        return client_row;
+        OPEN client_cur FOR SELECT * FROM CLIENT WHERE ID = par_id;
+    END;
+
+    PROCEDURE GetClientByLogin(par_login in nvarchar2, client_cur out sys_refcursor) IS
+    BEGIN
+        OPEN client_cur FOR SELECT * FROM CLIENT WHERE ACCOUNT_LOGIN = par_login;
     END;
 
     PROCEDURE GetAllClients(client_cur out sys_refcursor) IS
@@ -93,7 +96,7 @@ CREATE OR REPLACE PACKAGE BODY Client_Package IS
                     (SELECT COUNT(*) FROM CONTRACT C WHERE CLIENT_ID = par_id);
 
         OPEN tariff_plan_cur FOR SELECT * FROM TARIFF_PLAN WHERE ID IN
-            (SELECT ITEM_ID FROM DM$P4TARIFF_ASSOC_MODEL WHERE ITEMSET_ID IN
+            (SELECT ITEM_ID FROM DM$P4TARIFF_ASSOC_MODEL M4 WHERE ITEMSET_ID IN
             (SELECT CONSEQUENT_ITEMSET_ID FROM (SELECT * FROM DM$P0TARIFF_ASSOC_MODEL
             WHERE ANTECEDENT_ITEMSET_ID = selected_item_set ORDER BY LIFT DESC) WHERE ROWNUM <= par_recommendations_count));
     EXCEPTION
@@ -106,3 +109,4 @@ CREATE OR REPLACE PACKAGE BODY Client_Package IS
     END;
 
 END Client_Package;
+

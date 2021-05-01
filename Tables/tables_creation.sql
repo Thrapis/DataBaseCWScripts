@@ -29,7 +29,7 @@ CREATE TABLE Client(
 id int DEFAULT client_seq.NEXTVAL PRIMARY KEY,
 full_name nvarchar2(50) NOT NULL,
 passport_number nvarchar2(12) NOT NULL,
-account_login nvarchar2(50) NOT NULL,
+account_login nvarchar2(50) NOT NULL UNIQUE,
 FOREIGN KEY (account_login) REFERENCES Account(login)
 );
 
@@ -58,7 +58,7 @@ CREATE TABLE Employee(
 id int DEFAULT employee_seq.NEXTVAL PRIMARY KEY,
 full_name nvarchar2(50) NOT NULL,
 post_id int NOT NULL,
-account_login nvarchar2(50) NOT NULL,
+account_login nvarchar2(50) NOT NULL UNIQUE,
 FOREIGN KEY (post_id) REFERENCES Post(id),
 FOREIGN KEY (account_login) REFERENCES Account(login)
 );
@@ -91,7 +91,7 @@ id int DEFAULT phone_number_seq.NEXTVAL PRIMARY KEY,
 phone_number nvarchar2(14) NOT NULL,
 contract_id int NOT NULL,
 CONSTRAINT phone_regex_pn  CHECK (REGEXP_LIKE (phone_number, '^((\+\d{3})|(\d{2}))\d{2}\d{3}\d{4}$')),
-FOREIGN KEY (contract_id) REFERENCES Contract(id)
+FOREIGN KEY (contract_id) REFERENCES Contract(id) ON DELETE CASCADE
 );
 
 CREATE SEQUENCE call_seq INCREMENT BY 1;
@@ -103,7 +103,7 @@ to_phone_number nvarchar2(14) NOT NULL,
 talk_time interval day to second NOT NULL,
 call_datetime timestamp NOT NULL,
 CONSTRAINT phone_regex_c  CHECK (REGEXP_LIKE (to_phone_number, '^((\+\d{3})|(\d{2}))\d{2}\d{3}\d{4}$')),
-FOREIGN KEY (contract_id) REFERENCES Contract(id)
+FOREIGN KEY (contract_id) REFERENCES Contract(id) ON DELETE CASCADE
 );
 
 CREATE SEQUENCE payment_seq INCREMENT BY 1;
@@ -113,7 +113,7 @@ id int DEFAULT payment_seq.NEXTVAL PRIMARY KEY,
 contract_id int NOT NULL,
 payment_amount float(126) NOT NULL,
 payment_datetime timestamp NOT NULL,
-FOREIGN KEY (contract_id) REFERENCES Contract(id)
+FOREIGN KEY (contract_id) REFERENCES Contract(id) ON DELETE CASCADE
 );
 
 CREATE SEQUENCE debit_seq INCREMENT BY 1;
@@ -124,7 +124,7 @@ contract_id int NOT NULL,
 debit_amount float(126) NOT NULL,
 debit_datetime timestamp NOT NULL,
 reason nvarchar2(250) NOT NULL,
-FOREIGN KEY (contract_id) REFERENCES Contract(id)
+FOREIGN KEY (contract_id) REFERENCES Contract(id) ON DELETE CASCADE
 );
 
 
@@ -139,10 +139,8 @@ description_id int NOT NULL,
 service_amount float(126) NOT NULL,
 connection_date timestamp NOT NULL,
 disconnection_date timestamp NOT NULL,
-FOREIGN KEY (contract_id) REFERENCES Contract(id),
+FOREIGN KEY (contract_id) REFERENCES Contract(id) ON DELETE CASCADE,
 FOREIGN KEY (description_id) REFERENCES Service_description(id)
 );
 
 -----------------------
-
-
