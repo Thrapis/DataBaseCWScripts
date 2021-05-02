@@ -4,7 +4,9 @@ CREATE OR REPLACE PACKAGE Employee_Package IS
 	PROCEDURE UpdateEmployee(par_id in int, par_full_name in nvarchar2, par_post_id in int, par_account_login in nvarchar2, updated out int);
     PROCEDURE DeleteEmployee(par_id in int, deleted out int);
 	PROCEDURE GetEmployeeById(par_id in int, employee_cur out sys_refcursor);
+	PROCEDURE GetEmployeeByLogin(par_login in nvarchar2, employee_cur out sys_refcursor);
 	PROCEDURE GetAllEmployees(employee_cur out sys_refcursor);
+	PROCEDURE GetAllContractsByEmployeeId(par_id in int, contract_cur out sys_refcursor);
 END Employee_Package;
 
 
@@ -54,9 +56,21 @@ CREATE OR REPLACE PACKAGE BODY Employee_Package IS
         OPEN employee_cur FOR SELECT * FROM EMPLOYEE WHERE ID = par_id;
     END;
 
+    PROCEDURE GetEmployeeByLogin(par_login in nvarchar2, employee_cur out sys_refcursor) IS
+    BEGIN
+        OPEN employee_cur FOR SELECT * FROM EMPLOYEE WHERE ACCOUNT_LOGIN = par_login;
+    END;
+
     PROCEDURE GetAllEmployees(employee_cur out sys_refcursor) IS
     BEGIN
         OPEN employee_cur FOR SELECT * FROM EMPLOYEE;
+    END;
+
+    PROCEDURE GetAllContractsByEmployeeId(par_id in int, contract_cur out sys_refcursor) IS
+    BEGIN
+        OPEN contract_cur FOR SELECT C.* FROM CONTRACT C
+            INNER JOIN EMPLOYEE E ON C.EMPLOYEE_ID = E.ID
+            WHERE E.ID = par_id;
     END;
 
 END Employee_Package;

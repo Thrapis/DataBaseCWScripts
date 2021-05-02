@@ -36,11 +36,7 @@ begin
     );
 end;
 
-select * from dba_sys_privs where grantee = 'C##BAA';
-
 ALTER DATABASE SET TIME_ZONE = 'Europe/Minsk';
-
-alter session set time_zone = 'Europe/Minsk';
 
 SELECT DBTIMEZONE FROM DUAL;
 

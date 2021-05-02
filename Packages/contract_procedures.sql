@@ -7,6 +7,7 @@ CREATE OR REPLACE PACKAGE Contract_Package IS
 	PROCEDURE GetAllContracts(contract_cur out sys_refcursor);
 	PROCEDURE GetContractBalance(par_id in int, balance out float);
 	PROCEDURE GetAllServicesByContractId(par_id in int, service_cur out sys_refcursor);
+	PROCEDURE GetAllPhoneNumbersByContractId(par_id in int, phone_number_cur out sys_refcursor);
 	PROCEDURE GetServiceRecommendationsByContract(par_id in int, par_recommendations_count in int, service_descriptions_cur out sys_refcursor);
 END Contract_Package;
 
@@ -69,6 +70,13 @@ CREATE OR REPLACE PACKAGE BODY Contract_Package IS
     BEGIN
         OPEN service_cur FOR SELECT S.* FROM SERVICE S
             INNER JOIN CONTRACT C on S.CONTRACT_ID = C.ID
+            WHERE C.ID = par_id;
+    END;
+
+    PROCEDURE GetAllPhoneNumbersByContractId(par_id in int, phone_number_cur out sys_refcursor) IS
+    BEGIN
+        OPEN phone_number_cur FOR SELECT PN.* FROM PHONE_NUMBER PN
+            INNER JOIN CONTRACT C on PN.CONTRACT_ID = C.ID
             WHERE C.ID = par_id;
     END;
 
