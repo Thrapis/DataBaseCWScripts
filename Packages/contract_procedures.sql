@@ -1,13 +1,26 @@
 
 CREATE OR REPLACE PACKAGE Contract_Package IS
+    -- Вставка договора
 	PROCEDURE InsertContract(par_tariff_id in int, par_client_id in int, par_employee_id in int, par_signing_datetime in nvarchar2, inserted out int);
+	-- Обновление договора
 	PROCEDURE UpdateContract(par_id in int, par_tariff_id in int, par_client_id in int, par_employee_id in int, par_signing_datetime in nvarchar2, updated out int);
-    PROCEDURE DeleteContract(par_id in int, deleted out int);
+    -- Удаление договора
+	PROCEDURE DeleteContract(par_id in int, deleted out int);
+	-- Получение договора по его идентификатору
 	PROCEDURE GetContractById(par_id in int, contract_cur out sys_refcursor);
+	-- Получение всех договоров в базе данных
 	PROCEDURE GetAllContracts(contract_cur out sys_refcursor);
+	-- Получение баланса договора
 	PROCEDURE GetContractBalance(par_id in int, balance out float);
+	-- Получение всех сервисов договора по его идентификатору
 	PROCEDURE GetAllServicesByContractId(par_id in int, service_cur out sys_refcursor);
+	-- Получение всех номеров телефона договора по его идентификатору
 	PROCEDURE GetAllPhoneNumbersByContractId(par_id in int, phone_number_cur out sys_refcursor);
+	-- Получение всех оплат договора по его идентификатору
+	PROCEDURE GetAllPaymentsByContractId(par_id in int, payment_cur out sys_refcursor);
+	-- Получение всех списаний договора по его идентификатору
+	PROCEDURE GetAllDebitsByContractId(par_id in int, debit_cur out sys_refcursor);
+	-- Получение рекомендаций сервисов по идентификатору договора
 	PROCEDURE GetServiceRecommendationsByContract(par_id in int, par_recommendations_count in int, service_descriptions_cur out sys_refcursor);
 END Contract_Package;
 
@@ -77,6 +90,20 @@ CREATE OR REPLACE PACKAGE BODY Contract_Package IS
     BEGIN
         OPEN phone_number_cur FOR SELECT PN.* FROM PHONE_NUMBER PN
             INNER JOIN CONTRACT C on PN.CONTRACT_ID = C.ID
+            WHERE C.ID = par_id;
+    END;
+
+    PROCEDURE GetAllPaymentsByContractId(par_id in int, payment_cur out sys_refcursor) IS
+    BEGIN
+        OPEN payment_cur FOR SELECT P.* FROM PAYMENT P
+            INNER JOIN CONTRACT C ON P.CONTRACT_ID = C.ID
+            WHERE C.ID = par_id;
+    END;
+
+	PROCEDURE GetAllDebitsByContractId(par_id in int, debit_cur out sys_refcursor) IS
+    BEGIN
+        OPEN debit_cur FOR SELECT D.* FROM DEBIT D
+            INNER JOIN CONTRACT C ON D.CONTRACT_ID = C.ID
             WHERE C.ID = par_id;
     END;
 

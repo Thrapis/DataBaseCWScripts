@@ -1,13 +1,22 @@
 
 CREATE OR REPLACE PACKAGE Client_Package IS
+    -- Вставка клиента
 	PROCEDURE InsertClient(par_full_name in nvarchar2, par_passport_number in nvarchar2, par_account_login in nvarchar2, inserted out int);
-	PROCEDURE UpdateClient(par_id in int, par_full_name in nvarchar2, par_passport_number in nvarchar2, par_account_login in nvarchar2, updated out int);
+	-- Обновление клиента
+    PROCEDURE UpdateClient(par_id in int, par_full_name in nvarchar2, par_passport_number in nvarchar2, par_account_login in nvarchar2, updated out int);
+    -- Удаление клиента
     PROCEDURE DeleteClient(par_id in int, deleted out int);
-	PROCEDURE GetClientById(par_id in int, client_cur out sys_refcursor);
-	PROCEDURE GetClientByLogin(par_login in nvarchar2, client_cur out sys_refcursor);
-	PROCEDURE GetAllClients(client_cur out sys_refcursor);
-	PROCEDURE GetAllServicesByClientId(par_id in int, service_cur out sys_refcursor);
-	PROCEDURE GetAllContractsByClientId(par_id in int, contract_cur out sys_refcursor);
+	-- Получение клиента по его идентификатору
+    PROCEDURE GetClientById(par_id in int, client_cur out sys_refcursor);
+	-- Получение клиента по логину его аккаунта
+    PROCEDURE GetClientByLogin(par_login in nvarchar2, client_cur out sys_refcursor);
+	-- Получене всех пользователей базы данных
+    PROCEDURE GetAllClients(client_cur out sys_refcursor);
+	-- Получение всех услуг клиента по его идентификатору
+    PROCEDURE GetAllServicesByClientId(par_id in int, service_cur out sys_refcursor);
+	-- Получение всех договоров по его идентификатору
+    PROCEDURE GetAllContractsByClientId(par_id in int, contract_cur out sys_refcursor);
+    -- Получение рекомендаций тарифов по идентификатору клиента
     PROCEDURE GetTariffRecommendationsByClientId(par_id in int, par_recommendations_count in int, tariff_plan_cur out sys_refcursor);
 END Client_Package;
 

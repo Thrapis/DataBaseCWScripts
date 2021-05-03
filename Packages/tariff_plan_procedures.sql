@@ -1,9 +1,14 @@
 
 CREATE OR REPLACE PACKAGE TariffPlan_Package IS
+    -- Вставка тарифного плана
 	PROCEDURE InsertTariffPlan(par_tariff_name in nvarchar2, par_tariff_amount in float, inserted out int);
+	-- Обновление тарифоного плана
 	PROCEDURE UpdateTariffPlan(par_id in int, par_tariff_name in nvarchar2, par_tariff_amount in float, updated out int);
-    PROCEDURE DeleteTariffPlan(par_id in int, deleted out int);
+    -- Удаление тарифного плана
+	PROCEDURE DeleteTariffPlan(par_id in int, deleted out int);
+	-- Получение тарифного плана по его идентификатору
 	PROCEDURE GetTariffPlanById(par_id in int, tariff_plan_cur out sys_refcursor);
+	-- Получение всех тарифных планов базы данных
 	PROCEDURE GetAllTariffPlans(tariff_plan_cur out sys_refcursor);
 END TariffPlan_Package;
 

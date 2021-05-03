@@ -1,9 +1,14 @@
 
 CREATE OR REPLACE PACKAGE Call_Package IS
+    -- Вставка звонка
 	PROCEDURE InsertCall(par_contract_id in int, par_to_phone_number in nvarchar2, par_talk_time in nvarchar2, par_call_datetime in nvarchar2, inserted out int);
-	PROCEDURE UpdateCall(par_id in int, par_contract_id in int, par_to_phone_number in nvarchar2, par_talk_time in nvarchar2, par_call_datetime in nvarchar2, updated out int);
+	-- Обновление звонка
+    PROCEDURE UpdateCall(par_id in int, par_contract_id in int, par_to_phone_number in nvarchar2, par_talk_time in nvarchar2, par_call_datetime in nvarchar2, updated out int);
+    -- Удаление звонка
     PROCEDURE DeleteCall(par_id in int, deleted out int);
-	PROCEDURE GetCallById(par_id in int, call_cur out sys_refcursor);
+	-- Получение звонка по его идентификатору
+    PROCEDURE GetCallById(par_id in int, call_cur out sys_refcursor);
+    -- Получение всех звонков в базе данных
 	PROCEDURE GetAllCalls(call_cur out sys_refcursor);
 END Call_Package;
 

@@ -1,10 +1,15 @@
 
 CREATE OR REPLACE PACKAGE Post_Package IS
-	PROCEDURE InsertPost(par_post_name in nvarchar2, par_category in nvarchar2, inserted out int);
-	PROCEDURE UpdatePost(par_id in int, par_post_name in nvarchar2, par_category in nvarchar2, updated out int);
+    -- Вставка должности
+    PROCEDURE InsertPost(par_post_name in nvarchar2, par_category in nvarchar2, inserted out int);
+    -- Обновление должности
+    PROCEDURE UpdatePost(par_id in int, par_post_name in nvarchar2, par_category in nvarchar2, updated out int);
+    -- Удаление должности
     PROCEDURE DeletePost(par_id in int, deleted out int);
-	PROCEDURE GetPostById(par_id in int, post_cur out sys_refcursor);
-	PROCEDURE GetAllPosts(post_cur out sys_refcursor);
+    -- Получение должности по его идентификатору
+    PROCEDURE GetPostById(par_id in int, post_cur out sys_refcursor);
+    -- Получение всех должностей базы данных
+    PROCEDURE GetAllPosts(post_cur out sys_refcursor);
 END Post_Package;
 
 

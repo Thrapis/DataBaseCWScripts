@@ -1,10 +1,15 @@
 
 CREATE OR REPLACE PACKAGE ServiceDescription_Package IS
-	PROCEDURE InsertServiceDescription(par_service_name in nvarchar2, par_service_description in nvarchar2, inserted out int);
-	PROCEDURE UpdateServiceDescription(par_id in int, par_service_name in nvarchar2, par_service_description in nvarchar2, updated out int);
+	-- Встака описания услуги
+    PROCEDURE InsertServiceDescription(par_service_name in nvarchar2, par_service_description in nvarchar2, inserted out int);
+	-- Обновление описания услуги
+    PROCEDURE UpdateServiceDescription(par_id in int, par_service_name in nvarchar2, par_service_description in nvarchar2, updated out int);
+    -- Удаление описания услуги
     PROCEDURE DeleteServiceDescription(par_id in int, deleted out int);
-	PROCEDURE GetServiceDescriptionById(par_id in int, service_desc_cur out sys_refcursor);
-	PROCEDURE GetAllServiceDescriptions(service_desc_cur out sys_refcursor);
+	-- Получение описания услуги по его идентификатору
+    PROCEDURE GetServiceDescriptionById(par_id in int, service_desc_cur out sys_refcursor);
+	-- Получение всех описаний услуг базы данных
+    PROCEDURE GetAllServiceDescriptions(service_desc_cur out sys_refcursor);
 END ServiceDescription_Package;
 
 

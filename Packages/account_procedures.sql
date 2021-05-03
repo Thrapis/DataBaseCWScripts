@@ -1,9 +1,13 @@
 -- set server--output on;
 
 CREATE OR REPLACE PACKAGE Account_Package IS
+    -- Создание аккаунта
 	PROCEDURE CreateAccount(par_username in nvarchar2, par_password in nvarchar2, par_access_level in int, created out int);
+    -- Получение уровня доступа аккаунта, если введённые данные верны
     PROCEDURE GetAccount(par_username in out nvarchar2, par_password in nvarchar2, ret_access_level out int);
+    -- Поменять пароль аккаунта
     PROCEDURE ChangeAccountPassword(par_username in out nvarchar2, par_old_password in nvarchar2, par_new_password in nvarchar2, changed out int);
+    -- Вставка события аккаунта
     PROCEDURE InsertAccountEvent(par_username in nvarchar2, par_event_datetime in nvarchar2, par_message in nvarchar2, inserted out int);
 END Account_Package;
 

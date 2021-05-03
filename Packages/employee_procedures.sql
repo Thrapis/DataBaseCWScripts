@@ -1,12 +1,19 @@
 
 CREATE OR REPLACE PACKAGE Employee_Package IS
+    -- Вставка сотрудника
 	PROCEDURE InsertEmployee(par_full_name in nvarchar2, par_post_id in int, par_account_login in nvarchar2, inserted out int);
-	PROCEDURE UpdateEmployee(par_id in int, par_full_name in nvarchar2, par_post_id in int, par_account_login in nvarchar2, updated out int);
+    -- Обновление сотрудника
+    PROCEDURE UpdateEmployee(par_id in int, par_full_name in nvarchar2, par_post_id in int, par_account_login in nvarchar2, updated out int);
+    -- Удаление сотрудника
     PROCEDURE DeleteEmployee(par_id in int, deleted out int);
-	PROCEDURE GetEmployeeById(par_id in int, employee_cur out sys_refcursor);
-	PROCEDURE GetEmployeeByLogin(par_login in nvarchar2, employee_cur out sys_refcursor);
-	PROCEDURE GetAllEmployees(employee_cur out sys_refcursor);
-	PROCEDURE GetAllContractsByEmployeeId(par_id in int, contract_cur out sys_refcursor);
+    -- Получение сотрудника по его идентификатору
+    PROCEDURE GetEmployeeById(par_id in int, employee_cur out sys_refcursor);
+    -- Получение сотрудника по логину его аккаунта
+    PROCEDURE GetEmployeeByLogin(par_login in nvarchar2, employee_cur out sys_refcursor);
+    -- Получение всех сотрудников базы данных
+    PROCEDURE GetAllEmployees(employee_cur out sys_refcursor);
+    -- Получение договоров, подписанных сотрудником, используя его идентификатор
+    PROCEDURE GetAllContractsByEmployeeId(par_id in int, contract_cur out sys_refcursor);
 END Employee_Package;
 
 

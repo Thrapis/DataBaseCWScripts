@@ -1,11 +1,17 @@
 
 CREATE OR REPLACE PACKAGE PhoneNumber_Package IS
-	PROCEDURE InsertPhoneNumber(par_phone_number in nvarchar2, par_contract_id in int, inserted out int);
-	PROCEDURE UpdatePhoneNumber(par_id in int, par_phone_number in nvarchar2, par_contract_id in int, updated out int);
+    -- Вставка номера телефона
+    PROCEDURE InsertPhoneNumber(par_phone_number in nvarchar2, par_contract_id in int, inserted out int);
+    -- Обновление номера телефона
+    PROCEDURE UpdatePhoneNumber(par_id in int, par_phone_number in nvarchar2, par_contract_id in int, updated out int);
+    -- Удаление номера телефона
     PROCEDURE DeletePhoneNumber(par_id in int, deleted out int);
-	PROCEDURE GetPhoneNumberById(par_id in int, phone_number_cur out sys_refcursor);
-	PROCEDURE GetPhoneNumberByNumber(par_number in nvarchar2, phone_number_cur out sys_refcursor);
-	PROCEDURE GetAllPhoneNumbers(phone_number_cur out sys_refcursor);
+    -- Получение номера телефона по его идентификатору
+    PROCEDURE GetPhoneNumberById(par_id in int, phone_number_cur out sys_refcursor);
+    -- Получение номера телефона по полю номера телефона
+    PROCEDURE GetPhoneNumberByNumber(par_number in nvarchar2, phone_number_cur out sys_refcursor);
+    -- Получение всех номеров телефона базы данных
+    PROCEDURE GetAllPhoneNumbers(phone_number_cur out sys_refcursor);
 END PhoneNumber_Package;
 
 

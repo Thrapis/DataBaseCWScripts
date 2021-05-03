@@ -1,10 +1,15 @@
 
 CREATE OR REPLACE PACKAGE Payment_Package IS
-	PROCEDURE InsertPayment(par_contract_id in int, par_payment_amount in float, par_payment_datetime in nvarchar2, inserted out int);
-	PROCEDURE UpdatePayment(par_id in int, par_contract_id in int, par_payment_amount in float, par_payment_datetime in nvarchar2, updated out int);
+	-- Вставка оплаты
+    PROCEDURE InsertPayment(par_contract_id in int, par_payment_amount in float, par_payment_datetime in nvarchar2, inserted out int);
+	-- Обновление оплаты
+    PROCEDURE UpdatePayment(par_id in int, par_contract_id in int, par_payment_amount in float, par_payment_datetime in nvarchar2, updated out int);
+    -- Удаление оплаты
     PROCEDURE DeletePayment(par_id in int, deleted out int);
-	PROCEDURE GetPaymentById(par_id in int, payment_cur out sys_refcursor);
-	PROCEDURE GetAllPayments(payment_cur out sys_refcursor);
+	-- Получение оплаты по его идентификатору
+    PROCEDURE GetPaymentById(par_id in int, payment_cur out sys_refcursor);
+	-- Получение всех оплат базы данных
+    PROCEDURE GetAllPayments(payment_cur out sys_refcursor);
 END Payment_Package;
 
 

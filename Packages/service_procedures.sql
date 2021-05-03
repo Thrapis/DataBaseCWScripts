@@ -1,10 +1,16 @@
 
 CREATE OR REPLACE PACKAGE Service_Package IS
+    -- Вставка услуги
 	PROCEDURE InsertService(par_contract_id in int, par_description_id in int, par_service_amount in float, par_connection_date in nvarchar2, par_disconnection_date in nvarchar2, inserted out int);
+	-- Обновление услуги
 	PROCEDURE UpdateService(par_id in int, par_contract_id in int, par_description_id in int, par_service_amount in float, par_connection_date in nvarchar2, par_disconnection_date in nvarchar2, updated out int);
-    PROCEDURE DeleteService(par_id in int, deleted out int);
+    -- Удаление услуги
+	PROCEDURE DeleteService(par_id in int, deleted out int);
+	-- Получение услуги по его идентификатору
 	PROCEDURE GetServiceById(par_id in int, service_cur out sys_refcursor);
+	-- Получение всех услуг базы данных
 	PROCEDURE GetAllServices(service_cur out sys_refcursor);
+	-- Очистка базы данных от простроченных услуг
 	PROCEDURE ClearExpiredServices;
 END Service_Package;
 

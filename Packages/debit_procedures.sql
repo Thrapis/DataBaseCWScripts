@@ -1,11 +1,17 @@
 
 CREATE OR REPLACE PACKAGE Debit_Package IS
-	PROCEDURE InsertDebit(par_contract_id in int, par_debit_amount in float, par_debit_datetime in nvarchar2, par_reason in nvarchar2, inserted out int);
-	PROCEDURE UpdateDebit(par_id in int, par_contract_id in int, par_debit_amount in float, par_debit_datetime in nvarchar2, par_reason in nvarchar2, updated out int);
+	-- Вставка списания
+    PROCEDURE InsertDebit(par_contract_id in int, par_debit_amount in float, par_debit_datetime in nvarchar2, par_reason in nvarchar2, inserted out int);
+	-- Обноваление списания
+    PROCEDURE UpdateDebit(par_id in int, par_contract_id in int, par_debit_amount in float, par_debit_datetime in nvarchar2, par_reason in nvarchar2, updated out int);
+    -- Удаление списания
     PROCEDURE DeleteDebit(par_id in int, deleted out int);
-	PROCEDURE GetDebitById(par_id in int, debit_cur out sys_refcursor);
-	PROCEDURE GetAllDebits(debit_cur out sys_refcursor);
-	PROCEDURE DetectAndInsertTermDebits;
+	-- Получение списания по его идентификатору
+    PROCEDURE GetDebitById(par_id in int, debit_cur out sys_refcursor);
+	-- Получение всех списаний базы данных
+    PROCEDURE GetAllDebits(debit_cur out sys_refcursor);
+	-- Определение и вставка списаний, которые должны произойти по причине наступления срока оплаты
+    PROCEDURE DetectAndInsertTermDebits;
 END Debit_Package;
 
 
