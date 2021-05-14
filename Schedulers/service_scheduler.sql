@@ -4,7 +4,7 @@ select * from user_jobs;
 
 select * from dba_jobs_running;
 
-begin
+BEGIN
     dbms_scheduler.create_schedule
     (
         schedule_name => 'sch_services_clear_expired',
@@ -12,9 +12,9 @@ begin
         repeat_interval => 'FREQ=HOURLY; INTERVAL=1',
         comments => 'sch_payments_clear_expired HOURLY at *:00:00'
     );
-end;
+END;
 
-begin
+BEGIN
     dbms_scheduler.create_program
     (
         program_name => 'program_services_clear_expired',
@@ -24,9 +24,9 @@ begin
         enabled => true,
         comments => 'program_payments_clear_expired doing ClearExpiredServices'
     );
-end;
+END;
 
-begin
+BEGIN
     dbms_scheduler.create_job
     (
         job_name => 'job_services_clear_expired',
@@ -34,7 +34,7 @@ begin
         schedule_name => 'sch_services_clear_expired',
         enabled => true
     );
-end;
+END;
 
 select * from dba_sys_privs where grantee = 'C##BAA';
 

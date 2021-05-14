@@ -4,7 +4,7 @@ select * from user_jobs;
 
 select * from dba_jobs_running;
 
-begin
+BEGIN
     dbms_scheduler.create_schedule
     (
         schedule_name => 'sch_debits_detection',
@@ -12,9 +12,9 @@ begin
         repeat_interval => 'FREQ=MINUTELY; INTERVAL=1',
         comments => 'sch_debits_detection MINUTELY at *:00'
     );
-end;
+END;
 
-begin
+BEGIN
     dbms_scheduler.create_program
     (
         program_name => 'program_debits_detection',
@@ -24,9 +24,9 @@ begin
         enabled => true,
         comments => 'program_debits_detection doing DetectAndInsertTermDebits'
     );
-end;
+END;
 
-begin
+BEGIN
     dbms_scheduler.create_job
     (
         job_name => 'job_debits_detection',
@@ -34,7 +34,7 @@ begin
         schedule_name => 'sch_debits_detection',
         enabled => true
     );
-end;
+END;
 
 ALTER DATABASE SET TIME_ZONE = 'Europe/Minsk';
 
